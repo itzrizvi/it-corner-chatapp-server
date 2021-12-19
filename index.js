@@ -21,6 +21,7 @@ async function run(){
         await client.connect();
         const database = client.db("it_cornerChat");
         const usersCollection = database.collection("users_data");
+        const messegeCollection = database.collection("messege_History");
         console.log("DB CONNECTED");
 
         // Adding user by register
@@ -43,7 +44,28 @@ async function run(){
             const query = {email: email}
             const findEmail = await usersCollection.findOne(query);
             res.json(findEmail);
-        })
+        });
+
+        // Adding messege history
+        app.post('/msghistory', async (req,res)=>{
+            const messegeReq = req.body;
+            const result = await messegeCollection.insertOne(messegeReq);
+            res.json(result);
+        });
+
+        app.get('/msghistory/:name', async(req, res)=>{
+            const name = req.params.name;
+            const query ={user:name};
+            const findUser = await messegeCollection.findOne(query);
+            res.json(findUser);
+        });
+
+         // GET all MSG
+         app.get('/msghistory', async (req,res)=>{
+            const cursor = messegeCollection.find({});
+            const allMsg = await cursor.toArray();
+            res.send(allMsg);
+        });
 
 
 
@@ -65,7 +87,8 @@ io.on("connection", (socket) => {
         users[socket.id] = user;
         // console.log(`${user} is logged in!!!`);
         socket.broadcast.emit('joinedUser', { user: 'Admin', message: `${users[socket.id]} Has Joined` });
-        socket.emit('welcome', { user: 'Admin', message: `Welcome to the chat ${users[socket.id]}` });
+        socket.emit('welcome', { user: 'Admin', message: `Hi ${users[socket.id]} Welcome to the IT-Corner Messenger - the #1 business messenger for connecting you to your customers. Want to find out more about IT-Corner?` });
+        
     });
 
     socket.on("message", ({ message, id }) => {
@@ -77,7 +100,7 @@ io.on("connection", (socket) => {
     // })
     socket.on('typingProcess', (typingKeys) => {
         socket.broadcast.emit('typingProcess', typingKeys);
-    })
+    });
 
     socket.on('user', (user)=>{
         socket.broadcast.emit('user', user);
