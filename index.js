@@ -86,8 +86,8 @@ io.on("connection", (socket) => {
     socket.on('logedIn', ({ user }) => {
         users[socket.id] = user;
         // console.log(`${user} is logged in!!!`);
-        socket.broadcast.emit('joinedUser', { user: 'Admin', message: `${users[socket.id]} Has Joined` });
-        socket.emit('welcome', { user: 'Admin', message: `Hi ${users[socket.id]} Welcome to the IT-Corner Messenger - the #1 business messenger for connecting you to your customers. Want to find out more about IT-Corner?` });
+        // socket.broadcast.emit('joinedUser', { user: 'Admin', message: `${users[socket.id]} Has Joined` });
+        // socket.emit('welcome', { user: 'Admin', message: `Hi ${users[socket.id]} Welcome to the IT-Corner Messenger - the #1 business messenger for connecting you to your customers. Want to find out more about IT-Corner?` });
         
     });
 
@@ -106,10 +106,10 @@ io.on("connection", (socket) => {
         socket.broadcast.emit('user', user);
     });
 
-    socket.on('disconnectUser', () => {
-        socket.broadcast.emit('leave', { user: 'Admin', message: `${users[socket.id]} Has Left` })
-        // console.log('User Left');
-    })
+    // socket.on('disconnectUser', () => {
+    //     socket.broadcast.emit('leave', { user: 'Admin', message: `${users[socket.id]} Has Left` })
+    //     // console.log('User Left');
+    // })
 
 
 
