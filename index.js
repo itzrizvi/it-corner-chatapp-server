@@ -2,6 +2,8 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
+const ObjectId = require('mongodb').ObjectId;
+const bodyParser = require('body-parser')
 const socketIO = require("socket.io");
 
 
@@ -12,6 +14,15 @@ const server = http.createServer(app);
 const users = [{}];
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json({
+    limit: '50mb'
+  }));
+  
+  app.use(bodyParser.urlencoded({
+    limit: '50mb',
+    parameterLimit: 100000,
+    extended: true 
+  }));
 
 const uri = "mongodb+srv://itCornerChat:01766922253@cluster1.fprcc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -55,8 +66,9 @@ async function run(){
 
         app.get('/msghistory/:name', async(req, res)=>{
             const name = req.params.name;
-            const query ={user:name};
-            const findUser = await messegeCollection.findOne(query);
+            // const query ={user:name};
+            const findUser = messegeCollection.find({user:name});
+            console.log(findUser)
             res.json(findUser);
         });
 
@@ -91,8 +103,8 @@ io.on("connection", (socket) => {
         
     });
 
-    socket.on("message", ({ message, id }) => {
-        io.emit('messageSent', { user: users[id], message, id });
+    socket.on("message", ({ message, mediaFiles, id }) => {
+        io.emit('messageSent', { user: users[id], message, mediaFiles, id });
     });
 
     // socket.on('typing', (user) => {
